@@ -5,7 +5,7 @@ function Header(props) {
 
         <nav className="navbar navbar-dark bg-dark">
             <div className="container">
-                <a className="navbar-brand" href="#">
+                <a className="navbar-brand" href="/">
                     <img src={八卦} alt="" width="40" height="40"/>
                 </a>
                 <span className="navbar-text">
