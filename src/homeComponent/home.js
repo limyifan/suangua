@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {Button,  Form, FormControl, InputGroup, Row} from "react-bootstrap";
+import {Button,  Form, FormControl, InputGroup} from "react-bootstrap";
 import firebase from "../firebase";
-import {爻, 卦名, 编号} from "../gua";
+import {爻, 卦名} from "../gua";
 
 function Home(props) {
 
@@ -14,9 +14,6 @@ function Home(props) {
     const [辞, set辞] = useState("")
     const [卦1, set卦1] = useState("")
     const [卦2, set卦2] = useState("")
-    const [firstError, setFirstError] = useState("")
-    const [secondError, setSecondError] = useState("")
-    const [thirdError, setThirdError] = useState("")
 
     const changeHandler = e => {
         switch (e.currentTarget.name) {
