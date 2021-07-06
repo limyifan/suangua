@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Col, Form, FormControl, InputGroup, Row} from "react-bootstrap";
-import readXlsxFile from 'read-excel-file'
+import {Button,  Form, FormControl, InputGroup, Row} from "react-bootstrap";
 import firebase from "../firebase";
 import {爻, 卦名, 编号} from "../gua";
-import 卦象 from "./卦象";
 
 function Home(props) {
 
@@ -87,20 +85,12 @@ function Home(props) {
             setThirdError("This Field is Required")
 
     }, [thirdNumber])
-    const validate = () => {
-        if ((firstError + secondError + thirdError).length !== 0)
-            return false
 
-        return true
 
-    }
-    const isNumeric = (value) => {
-        return /^\d+$/.test(value);
-    }
     const submitForm = e => {
 
         e.preventDefault();
-
+ Z
 
         const a = convertToBinary(firstNumber % 8)
         const b = convertToBinary(secondNumber % 8)
