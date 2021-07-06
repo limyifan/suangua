@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Button,  Form, FormControl, InputGroup} from "react-bootstrap";
 import firebase from "../firebase";
 import {爻, 卦名} from "../gua";
