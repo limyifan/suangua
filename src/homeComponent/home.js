@@ -67,21 +67,6 @@ function Home(props) {
     //         })
     //     })
     // });
-    useEffect(() => {
-        if (firstNumber === "")
-            setFirstError("This Field is Required")
-
-    }, [firstNumber])
-    useEffect(() => {
-        if (secondNumber === "")
-            setSecondError("This Field is Required")
-
-    }, [secondNumber])
-    useEffect(() => {
-        if (thirdNumber === "")
-            setThirdError("This Field is Required")
-
-    }, [thirdNumber])
 
 
     const submitForm = e => {
