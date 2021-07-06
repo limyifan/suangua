@@ -93,7 +93,6 @@ function Home(props) {
 
 
         const a = convertToBinary(firstNumber % 8)
-        const a = convertToBinary(firstNumber % 8)
         const b = convertToBinary(secondNumber % 8)
         const c = (thirdNumber === 0 || thirdNumber % 6 === 0) ? 6 : thirdNumber % 6
         const result1 = b.toString() + a.toString()
