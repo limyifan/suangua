@@ -1,19 +1,26 @@
-import React, {useState} from 'react';
-import {Button,  Form, FormControl, InputGroup} from "react-bootstrap";
+import React, {useEffect, useState} from 'react';
+import {Button, Form, FormControl, InputGroup} from "react-bootstrap";
 import firebase from "../firebase";
 import {爻, 卦名} from "../gua";
+import Result from "../resultComponent/result";
+import Loader from 'react-loader-spinner';
+import "../assets/css/main.css"
 
-function Home(props) {
+function Home() {
 
-    const [firstNumber, setFirstNumber] = useState("")
-    const [secondNumber, setSecondNumber] = useState("")
-    const [thirdNumber, setThirdNumber] = useState("")
-    const [result1, setResult1] = useState("")
-    const [result12, setResult12] = useState("")
-    const [result2, setResult2] = useState("")
-    const [辞, set辞] = useState("")
-    const [卦1, set卦1] = useState("")
-    const [卦2, set卦2] = useState("")
+    const [firstNumber, setFirstNumber] = useState()
+    const [secondNumber, setSecondNumber] = useState()
+    const [thirdNumber, setThirdNumber] = useState()
+    const [result1, setResult1] = useState()
+    const [result12, setResult12] = useState()
+    // const [result2, setResult2] = useState()
+    const [辞, set辞] = useState()
+    const [卦1, set卦1] = useState()
+    // const [卦2, set卦2] = useState()
+    const [firstError, setFirstError] = useState()
+    const [secondError, setSecondError] = useState()
+    const [thirdError, setThirdError] = useState()
+    const [isLoading, setIsLoading] = useState(false)
 
     const changeHandler = e => {
         switch (e.currentTarget.name) {
@@ -67,23 +74,69 @@ function Home(props) {
     //         })
     //     })
     // });
+    useEffect(() => {
+        if (!firstNumber)
+            return
+        if (firstNumber === "")
+            setFirstError("此处不能为空")
+        else if (!isNumeric(firstNumber))
+            setFirstError("此处只能输入数字")
+        else
+            setFirstError("")
+    }, [firstNumber])
+    useEffect(() => {
+        if (!secondNumber)
+            return
+        if (secondNumber === "")
+            setSecondError("此处不能为空")
+        else if (!isNumeric(secondNumber))
+            setSecondError("此处只能输入数字")
+        else
+            setSecondError("")
+    }, [secondNumber])
+    useEffect(() => {
+        if (!thirdNumber)
+            return
+        if (thirdNumber === "")
+            setThirdError("此处不能为空")
+        else if (!isNumeric(thirdNumber))
+            setThirdError("此处只能输入数字")
+        else
+            setThirdError("")
+    }, [thirdNumber])
+    const validate = () => {
+        if (!firstNumber)
+            setFirstError("此处不能为空")
+        if (!secondNumber)
+            setSecondError("此处不能为空")
+        if (!thirdNumber)
+            setThirdError("此处不能为空")
+        if ((firstError + secondError + thirdError).length !== 0)
+            return false
 
+        return true
 
+    }
+    const isNumeric = (value) => {
+        return /^\d+$/.test(value);
+    }
     const submitForm = e => {
 
         e.preventDefault();
-
-
+        const isValidate = validate();
+        if (isValidate === false)
+            return
+        setIsLoading(true)
         const a = convertToBinary(firstNumber % 8)
         const b = convertToBinary(secondNumber % 8)
         const c = (thirdNumber === 0 || thirdNumber % 6 === 0) ? 6 : thirdNumber % 6
         const result1 = b.toString() + a.toString()
-        const result2 = 变爻(result1, c)
+        // const result2 = 变爻(result1, c)
         const 卦1 = 卦名[result1]["卦"];
         const 辞 = 爻[c]
-        const 卦2 = 卦名[result2]["卦"];
+        // const 卦2 = 卦名[result2]["卦"];
         set卦1(result1);
-        set卦2(result2);
+        // set卦2(result2);
         set辞(辞)
 
         const db = firebase.firestore();
@@ -102,25 +155,28 @@ function Home(props) {
             console.log("Error getting cached document:", error);
         });
 
-        db.collection(卦2).doc(爻[0].toString()).get().then((doc) => {
-            console.log("Cached document data:", doc.data());
-            setResult2(doc.data())
-        }).catch((error) => {
-            console.log("Error getting cached document:", error);
-        });
+        // db.collection(卦2).doc(爻[0].toString()).get().then((doc) => {
+        //     console.log("Cached document data:", doc.data());
+        //     setResult2(doc.data())
+        // }).catch((error) => {
+        //     console.log("Error getting cached document:", error);
+        // });
+        setTimeout(() => {
+            setIsLoading(false)
+        }, 1500)
 
 
     }
-    const 变爻 = (result, no) => {
-        const split = result.split('');
-        var changePosition = 6 - no;
-        //   console.log(result.substring(0,changePosition-1).toString())
-        // console.log(split[changePosition]==='0'?"1":"0")
-        //  console.log(result.substring(changePosition).toString())
-        var res = result.substring(0, changePosition).toString() + (split[changePosition] === '0' ? "1" : "0").toString() + result.substring(changePosition + 1).toString();
-        // console.log(res)
-        return res;
-    }
+    // const 变爻 = (result, no) => {
+    //     const split = result.split('');
+    //     let changePosition = 6 - no;
+    //     //   console.log(result.substring(0,changePosition-1).toString())
+    //     // console.log(split[changePosition]==='0'?"1":"0")
+    //     //  console.log(result.substring(changePosition).toString())
+    //     let res = result.substring(0, changePosition).toString() + (split[changePosition] === '0' ? "1" : "0").toString() + result.substring(changePosition + 1).toString();
+    //     // console.log(res)
+    //     return res;
+    // }
     const convertToBinary = number => {
         switch (number) {
             case(0):
@@ -145,6 +201,17 @@ function Home(props) {
                 return
         }
     }
+    const reset = () => {
+        setFirstNumber("")
+        setSecondNumber("")
+        setThirdNumber("")
+        setResult1(undefined)
+        setResult12(undefined)
+        // setResult2(undefined)
+        set辞(undefined)
+        set卦1(undefined)
+        // set卦2(undefined)
+    }
     return (
         <div>
             <div className="container-md col-lg-4 col-md-4 col-sm-4 container justify-content-center">
@@ -157,11 +224,12 @@ function Home(props) {
                             <FormControl
                                 onChange={changeHandler}
                                 name={"1"}
+                                value={firstNumber}
                                 aria-label="Default"
                                 aria-describedby="inputGroup-sizing-default"
                             />
                         </InputGroup>
-
+                        {firstError && <div className={"alert alert-danger"}>{firstError}</div>}
                     </Form.Group>
 
                     <InputGroup className="mb-3">
@@ -170,10 +238,12 @@ function Home(props) {
                             onChange={changeHandler}
                             name={"2"}
                             aria-label="Default"
+                            value={secondNumber}
                             aria-describedby="inputGroup-sizing-default"
                         />
 
                     </InputGroup>
+                    {secondError && <div className={"alert alert-danger"}>{secondError}</div>}
 
                     <InputGroup className="mb-3">
                         <InputGroup.Text id="inputGroup-sizing-default">第三个数字</InputGroup.Text>
@@ -182,10 +252,12 @@ function Home(props) {
                             name={"3"}
                             aria-label="Default"
                             aria-describedby="inputGroup-sizing-default"
+                            value={thirdNumber}
 
                         />
 
                     </InputGroup>
+                    {thirdError && <div className={"alert alert-danger"}>{thirdError}</div>}
 
                     <Button variant="primary" type="submit">
                         开始算命
@@ -195,33 +267,21 @@ function Home(props) {
                     使用《易经》占卦，需要遵守“三不占”原则：1.不诚不占：此乃求教于神明，首重真诚。2.不义不占：不合乎正当性及道义的问题，不必占问。3.不疑不占：必须是理性难以测度之事，因为有些问题依照常理常情可决定其结果，也不必占问。
                 </Form.Text>
             </div>
-            {/*<卦象 result={卦1}/>*/}
-            {卦1 !== "" && <h1>第一卦：{卦名[卦1]["卦"]}卦</h1>}
-            <ul>
-                {
-                    Object.keys(result1).map(function (key) {
-                        return <li key={key.id}>{`${key}: ${result1[key]}`}</li>
-                    })
-                }
-            </ul>
-            <h1>{辞}</h1>
-            <ul>
-                {
-                    Object.keys(result12).map(function (key) {
-                        return <li key={key.id}>{`${key}: ${result12[key]}`}</li>
-                    })
-                }
-            </ul>
-            {卦2 !== "" && <h1>第二卦：{卦名[卦2]["卦"]}卦</h1>}
-
-            <ul>
-                {
-                    Object.keys(result2).map(function (key) {
-                        return <li key={key.id}>{`${key}: ${result2[key]}`}</li>
-                    })
-                }
-            </ul>
-
+            {result1 && result12 && !isLoading && <div><a href="/" onClick={reset}><p>重新计算</p></a>
+                <Result 卦1={卦1} result1={result1} result12={result12} 辞={辞}/>
+            </div>}
+            {isLoading && <div
+                style={{
+                    width: "100%",
+                    height: "100",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingTop:"5vh"
+                }}
+            >
+                <Loader type="BallTriangle" color="#005bbd" height="15vh" width="15vh"/>
+            </div>}
         </div>
     );
 }
