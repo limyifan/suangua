@@ -64,7 +64,7 @@ class App extends Component {
                 <BrowserRouter>
                     <Header account={this.state.account}/>
                     <Switch>
-                        <Route  exact path={routes.HOME} component={Home}/>
+                        <Route  exact path={routes.HOME} render={()=><Home account={this.state.account} />}/>
                         <Redirect path={"*"} component={Home}/>
                         <Route  exact path={routes.ACCOUNT} render={()=><Account account={this.state.account} balance={this.state.balance}/>}/>
                         <Route  exact path={routes.ERROR} component={Error}/>

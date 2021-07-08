@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Form, FormControl, InputGroup} from "react-bootstrap";
 import firebase from "../firebase";
-import {爻, 卦名} from "../gua";
+import {爻, 卦名, 结果} from "../gua";
 import Result from "../resultComponent/result";
 import Loader from 'react-loader-spinner';
 import "../assets/css/main.css"
-
-function Home() {
+function Home({account}) {
 
     const [firstNumber, setFirstNumber] = useState()
     const [secondNumber, setSecondNumber] = useState()
@@ -14,13 +13,14 @@ function Home() {
     const [result1, setResult1] = useState()
     const [result12, setResult12] = useState()
     // const [result2, setResult2] = useState()
-    const [辞, set辞] = useState()
+    const [ci, setCi] = useState()
     const [卦1, set卦1] = useState()
     // const [卦2, set卦2] = useState()
     const [firstError, setFirstError] = useState()
     const [secondError, setSecondError] = useState()
     const [thirdError, setThirdError] = useState()
     const [isLoading, setIsLoading] = useState(false)
+    const db = firebase.firestore();
 
     const changeHandler = e => {
         switch (e.currentTarget.name) {
@@ -42,6 +42,7 @@ function Home() {
     //     const input = document.getElementById('input')
     //     input.addEventListener('change', () => {
     //         var num=0;
+    //         var s={};
     //         readXlsxFile(input.files[0]).then((rows) => {
     //            for(let i=0;i< rows.length;i++)
     //             {
@@ -63,11 +64,29 @@ function Home() {
     //                     运势建议:row[7],
     //                     发生概率:row[8],
     //                 }
-    //                 const db = firebase.firestore();
-    //                 db.collection(collectionName).doc(documentName).set(doc);
-    //                 console.log("added ",collectionName)
+    //                 switch(documentName)
+    //                 {
+    //                     case("一爻"):
+    //                         s[collectionName]={...s[collectionName],"一爻":doc}
+    //                     case("二爻"):
+    //                         s[collectionName]={...s[collectionName],"二爻":doc}
+    //                     case("三爻"):
+    //                         s[collectionName]={...s[collectionName],"三爻":doc}
+    //                     case("四爻"):
+    //                         s[collectionName]={...s[collectionName],"四爻":doc}
+    //                     case("五爻"):
+    //                         s[collectionName]={...s[collectionName],"五爻":doc}
+    //                     case("六爻"):
+    //                         s[collectionName]={...s[collectionName],"六爻":doc}
+    //                     case("卦辞"):
+    //                         s[collectionName]={...s[collectionName],"卦辞":doc}
     //             }
+    //                 // const db = firebase.firestore();
+    //                 // db.collection(collectionName).doc(documentName).set(doc);
+    //             }
+    //             localStorage.setItem('jso', JSON.stringify(s));
     //
+    //             console.log("added ",s)
     //
     //             // `rows` is an array of rows
     //             // each row being an array of cells.
@@ -130,42 +149,57 @@ function Home() {
         const a = convertToBinary(firstNumber % 8)
         const b = convertToBinary(secondNumber % 8)
         const c = (thirdNumber === 0 || thirdNumber % 6 === 0) ? 6 : thirdNumber % 6
-        const result1 = b.toString() + a.toString()
+        const total = b.toString() + a.toString()
         // const result2 = 变爻(result1, c)
-        const 卦1 = 卦名[result1]["卦"];
+        const 卦 = 卦名[total]["卦"];
         const 辞 = 爻[c]
         // const 卦2 = 卦名[result2]["卦"];
-        set卦1(result1);
+        set卦1(total);
         // set卦2(result2);
-        set辞(辞)
+        setCi(辞)
+        setResult1(结果[卦][辞.toString()])
+        setResult12(结果[卦][爻[0].toString()])
 
-        const db = firebase.firestore();
-        db.collection(卦1).doc(辞.toString()).get().then((doc) => {
-            console.log("Cached document data:", doc.data());
-            setResult1(doc.data())
-        }).catch((error) => {
-            console.log("Error getting cached document:", error);
-        });
+        addUserHistoru(total,辞,)
 
-        db.collection(卦1).doc(爻[0].toString()).get().then((doc) => {
-            console.log("Cached document data:", doc.data());
-            setResult12(doc.data())
-
-        }).catch((error) => {
-            console.log("Error getting cached document:", error);
-        });
-
-        // db.collection(卦2).doc(爻[0].toString()).get().then((doc) => {
-        //     console.log("Cached document data:", doc.data());
-        //     setResult2(doc.data())
-        // }).catch((error) => {
-        //     console.log("Error getting cached document:", error);
-        // });
         setTimeout(() => {
             setIsLoading(false)
         }, 1500)
 
+    }
+    const addUserHistoru=(卦1,ci)=>{
 
+        if(account)
+        {
+            db.collection("users").where("walletAddress","==",account).get().then((snapshot)=>{
+                if(snapshot.size===0)
+                {
+                    //create new document
+                    db.collection("users").add({
+                        walletAddress:account
+                    }).then((doc)=>{
+                        doc.collection("history").add(
+                            {
+                                time:Date.now(),
+                                gua:卦1.toString(),
+                                ci:ci,
+                            }
+                        )
+                        }
+                    )
+                }
+                else
+                {
+                    snapshot.docs[0].ref.collection("history").add(
+                        {
+                            time:Date.now(),
+                            gua:卦1.toString(),
+                            ci:ci,
+                        }
+                    )
+                }
+            })
+        }
     }
     // const 变爻 = (result, no) => {
     //     const split = result.split('');
@@ -208,7 +242,7 @@ function Home() {
         setResult1(undefined)
         setResult12(undefined)
         // setResult2(undefined)
-        set辞(undefined)
+        setCi(undefined)
         set卦1(undefined)
         // set卦2(undefined)
     }
@@ -268,7 +302,7 @@ function Home() {
                 </Form.Text>
             </div>
             {result1 && result12 && !isLoading && <div><a href="/" onClick={reset}><p>重新计算</p></a>
-                <Result 卦1={卦1} result1={result1} result12={result12} 辞={辞}/>
+                <Result 卦1={卦1} result1={result1} result12={result12} 辞={ci}/>
             </div>}
             {isLoading && <div
                 style={{
