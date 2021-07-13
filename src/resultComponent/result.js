@@ -5,6 +5,14 @@ import {Col, Container, Row} from "react-bootstrap";
 function Result({卦1,result1,result12,辞}) {
     return (
         <Container fluid>
+            <h1>计算结果：</h1>
+            <hr
+                style={{
+                    color: "black",
+                    backgroundColor: "black",
+                    height: 0.5
+                }}
+            />
             <Row className="justify-content-md-center">
                 <Col xs={12}>
                     <Tu result={卦1}/>

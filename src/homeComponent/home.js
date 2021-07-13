@@ -5,8 +5,11 @@ import {爻, 卦名, 结果} from "../gua";
 import Result from "../resultComponent/result";
 import Loader from 'react-loader-spinner';
 import "../assets/css/main.css"
-function Home({account}) {
+import web3 from "web3";
+import { useSnackbar } from 'notistack';
 
+function Home({account,contract}) {
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [firstNumber, setFirstNumber] = useState()
     const [secondNumber, setSecondNumber] = useState()
     const [thirdNumber, setThirdNumber] = useState()
@@ -139,32 +142,59 @@ function Home({account}) {
     const isNumeric = (value) => {
         return /^\d+$/.test(value);
     }
-    const submitForm = e => {
+
+    const submitForm = async e => {
 
         e.preventDefault();
         const isValidate = validate();
         if (isValidate === false)
             return
         setIsLoading(true)
-        const a = convertToBinary(firstNumber % 8)
-        const b = convertToBinary(secondNumber % 8)
-        const c = (thirdNumber === 0 || thirdNumber % 6 === 0) ? 6 : thirdNumber % 6
-        const total = b.toString() + a.toString()
-        // const result2 = 变爻(result1, c)
-        const 卦 = 卦名[total]["卦"];
-        const 辞 = 爻[c]
-        // const 卦2 = 卦名[result2]["卦"];
-        set卦1(total);
-        // set卦2(result2);
-        setCi(辞)
-        setResult1(结果[卦][辞.toString()])
-        setResult12(结果[卦][爻[0].toString()])
+        let amount = web3.utils.toWei("1",'ether' )//convert to wei
+       await contract.methods.transfer("0xc16689b9a55ACdB244a77726f7248f2B7069E80c",amount).send({from: account})
+            .on('transactionHash', function (hash) {
+                console.log(hash)
+            })
+            .on('receipt', function (receipt) {
+                console.log(receipt)
+                const a = convertToBinary(firstNumber % 8)
+                const b = convertToBinary(secondNumber % 8)
+                const c = (thirdNumber === 0 || thirdNumber % 6 === 0) ? 6 : thirdNumber % 6
+                const total = b.toString() + a.toString()
+                // const result2 = 变爻(result1, c)
+                const 卦 = 卦名[total]["卦"];
+                const 辞 = 爻[c]
+                // const 卦2 = 卦名[result2]["卦"];
+                set卦1(total);
+                // set卦2(result2);
+                setCi(辞)
+                setResult1(结果[卦][辞.toString()])
+                setResult12(结果[卦][爻[0].toString()])
 
-        addUserHistoru(total,辞,)
+                addUserHistoru(total, 辞,)
+                    setIsLoading(false)
 
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 1500)
+            })
+            .on('error', function (e, receipt) {
+                switch (e.code)
+                {
+                    case(4001):
+                        enqueueSnackbar(`Transaction rejected by user`, {variant: 'error',
+                            autoHideDuration: 3000,
+                        })
+                        setIsLoading(false)
+                        break
+
+                    default:
+                        enqueueSnackbar(`Transaction Failed`, {variant: 'error',
+                            autoHideDuration: 3000,
+                        })
+                        console.log('Error, deposit: ', e)
+                        setIsLoading(false)
+                        break
+                }
+            });
+
 
     }
     const addUserHistoru=(卦1,ci)=>{

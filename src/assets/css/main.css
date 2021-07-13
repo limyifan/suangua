@@ -1,3 +1,8 @@
+.navbar,
+.navbar-default {
+    background-image: linear-gradient(to right,#0F2027 ,#2C5364 100%) !important; /* override background image gradient w/ flat color */
+}
+
 ul {
     list-style-type: none;
 }
@@ -8,4 +13,18 @@ li{
 }
 .result{
     padding-top: 2vh;
+}
+.iconButton {
+    height: 36px;
+    width: 100px;
+    display: flex;
+    justifyContent: center;
+    alignItems: center;
+    alignSelf: center;
+    padding: 8px 10px;
+    borderRadius: 6px;
+    color: #fff;
+    fontSize: 12px;
+    backgroundColor: #F5F7FA;
+    cursor:pointer
 }
