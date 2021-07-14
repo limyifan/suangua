@@ -1,6 +1,6 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
-const fs = require('fs');
-const memonic = fs.readFileSync(".secret").toString().trim();
+// const fs = require('fs');
+// const memonic = fs.readFileSync(".secret").toString().trim();
 const provider= new HDWalletProvider({
   privateKeys:['819519033d54701f9ac18840ca77f46da8bce195047ae904f7ad75ee16f27c30'],
   providerOrUrl:"wss://data-seed-prebsc-1-s1.binance.org:8545"

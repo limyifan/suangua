@@ -9,7 +9,7 @@ import web3 from "web3";
 import { useSnackbar } from 'notistack';
 
 function Home({account,contract}) {
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar} = useSnackbar();
     const [firstNumber, setFirstNumber] = useState()
     const [secondNumber, setSecondNumber] = useState()
     const [thirdNumber, setThirdNumber] = useState()
@@ -133,10 +133,9 @@ function Home({account,contract}) {
             setSecondError("此处不能为空")
         if (!thirdNumber)
             setThirdError("此处不能为空")
-        if ((firstError + secondError + thirdError).length !== 0)
-            return false
+        return (firstError + secondError + thirdError).length === 0;
 
-        return true
+
 
     }
     const isNumeric = (value) => {

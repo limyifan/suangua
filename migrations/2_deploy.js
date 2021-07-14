@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const CBC = artifacts.require("CBC");
 
 module.exports = async function(deployer) {
