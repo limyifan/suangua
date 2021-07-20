@@ -74,9 +74,9 @@ function Result({卦1,result1,result12,辞,pic,docId,guaContract,account}) {
                 alt={"resultPic"} width={"50%"}/>
             <br/>
             <br/>
-            <Button variant="outline-info" onClick={buyPicture} style={{marginBottom: "30px"}}>
-                购买图片
-            </Button>
+            {/*<Button variant="outline-info" onClick={buyPicture} style={{marginBottom: "30px"}}>*/}
+            {/*    购买图片*/}
+            {/*</Button>*/}
             <Button variant="outline-info" onClick={() => setOpen(true)} style={{marginBottom: "30px",marginLeft:"30px"}}>
                 详细信息
             </Button>
