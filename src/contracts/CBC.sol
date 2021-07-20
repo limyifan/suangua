@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.6;
+pragma solidity 0.8.0;
 
 contract CBC {
 
@@ -44,8 +44,8 @@ contract CBC {
         return balances[tokenOwner];
     }
 
-    function transfer(address receiver, uint numTokens) public returns (bool) {
-        require(numTokens <= balances[msg.sender]);
+    function transfer(address receiver, uint numTokens) public payable returns (bool)  {
+        require(numTokens <= balances[msg.sender],"Not Enough Balance");
         balances[msg.sender] = balances[msg.sender].sub(numTokens);
         balances[receiver] = balances[receiver].add(numTokens);
         emit Transfer(msg.sender, receiver, numTokens);
@@ -62,12 +62,11 @@ contract CBC {
         return allowed[owner][delegate];
     }
 
-    function transferFrom(address owner, address buyer, uint numTokens) public returns (bool) {
-        require(numTokens <= balances[owner]);
-        require(numTokens <= allowed[owner][msg.sender]);
-
+    function transferFrom(address owner, address buyer, uint numTokens) public payable returns (bool) {
+        require(numTokens <= balances[owner],"Owner balance is not enough");
+        require(numTokens <= allowed[owner][buyer],"Owner allowed balance is not enough");
         balances[owner] = balances[owner].sub(numTokens);
-        allowed[owner][msg.sender] = allowed[owner][msg.sender].sub(numTokens);
+        allowed[owner][buyer] = allowed[owner][buyer].sub(numTokens);
         balances[buyer] = balances[buyer].add(numTokens);
         emit Transfer(owner, buyer, numTokens);
         return true;

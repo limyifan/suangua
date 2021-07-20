@@ -5,10 +5,10 @@ import * as routes from "../routes";
 import {Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {useSnackbar} from "notistack";
 import web3 from "web3";
+import {CBC_TOKEN_ADDRESS} from "../utilities/constants";
 
 function Header({cbcContract, account}) {
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
-    const TOKEN_ADDRESS = '0x7139b4A901b9147d5715Cc7b715337Cf295e5235';
 
     const hideAccountDetail = (id) => {
         return id.substring(0, 5) + "......" + id.substring(id.length - 3)
@@ -63,7 +63,7 @@ function Header({cbcContract, account}) {
                     params: {
                         type: 'ERC20', // Initially only supports ERC20, but eventually more!
                         options: {
-                            address: TOKEN_ADDRESS, // The address that the token is at.
+                            address: CBC_TOKEN_ADDRESS, // The address that the token is at.
                             symbol: 'CBC', // A ticker symbol or shorthand, up to 5 chars.
                             decimals: 18, // The number of decimals in the token
                             image: 'https://image.flaticon.com/icons/png/512/2927/2927910.png', // A string url of the token logo

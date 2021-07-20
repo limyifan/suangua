@@ -5,7 +5,7 @@ const EVM_REVERT = 'VM Exception while processing transaction: revert'
 const {expectRevert} = require('@openzeppelin/test-helpers');
 
 // eslint-disable-next-line no-undef
-contract('SimpleContract', ([deployer, user, strangeAccount]) => {
+contract('CBC Contract', ([deployer, user, strangeAccount]) => {
     let myContract
     const amount = web3.utils.toWei("10", "ether")
     const amountToTransfer = web3.utils.toWei("4", "ether")
@@ -44,7 +44,7 @@ contract('SimpleContract', ([deployer, user, strangeAccount]) => {
     describe('testing transfer function...', () => {
         beforeEach(async () => {
             await myContract.mint(amount, {from: deployer})
-            await myContract.transfer(user, amountToTransfer, {from: deployer}) //0.01 ETH
+            await myContract.transfer(user, amountToTransfer, {from: deployer})
         })
         it('transaction should fail with not enough user balance', async () => {
             await expectRevert(myContract.transfer(user, hugeAmountToTransfer, {from: deployer}), EVM_REVERT);

@@ -8,6 +8,7 @@ import {useSnackbar} from 'notistack';
 import {CircularProgressbarWithChildren} from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Result from "../resultComponent/result";
+import {RECEIVER_ADDRESS} from "../utilities/constants";
 
 function Home({account, cbcContract,guaContract}) {
     const {enqueueSnackbar} = useSnackbar();
@@ -165,8 +166,8 @@ function Home({account, cbcContract,guaContract}) {
         const isValidate = validate();
         if (isValidate === false)
             return
-        let amount = web3.utils.toWei("0.01", 'ether')//convert to wei
-        await cbcContract.methods.transfer("0xc16689b9a55ACdB244a77726f7248f2B7069E80c", amount).send({from: account})
+        let amount = web3.utils.toWei("0.1", 'ether')//convert to wei
+        await cbcContract.methods.transfer(RECEIVER_ADDRESS, amount).send({from: account})
             .on('transactionHash', function (hash) {
                 console.log(hash)
                 setIsLoading(true)
@@ -354,7 +355,7 @@ function Home({account, cbcContract,guaContract}) {
                 <Button variant="outline-danger" onClick={reset} style={{marginTop: "10px", marginBottom: "10px"}}>
                     重新计算
                 </Button>
-                <Result 卦1={卦1} result1={result1} result12={result12} 辞={ci} pic={pic} guaContract={guaContract} account={account} docId={docId}/>
+                <Result 卦1={卦1} result1={result1} result12={result12} 辞={ci} pic={pic} guaContract={guaContract} account={account} docId={docId} cbcContract={cbcContract}/>
             </div>}
             {isLoading && <div
                 style={{
