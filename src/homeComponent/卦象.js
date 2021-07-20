@@ -1,6 +1,5 @@
 import React from 'react';
 import {Col, Row} from "react-bootstrap";
-import {卦名} from "../gua";
 
 function Tu(props) {
 

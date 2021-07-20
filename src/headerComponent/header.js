@@ -5,7 +5,6 @@ import * as routes from "../routes";
 import {Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {useSnackbar} from "notistack";
 import web3 from "web3";
-import {卦名, 爻, 结果} from "../gua";
 
 function Header({cbcContract, account}) {
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();

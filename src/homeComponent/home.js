@@ -19,7 +19,7 @@ function Home({account, cbcContract,guaContract}) {
     // const [result2, setResult2] = useState()
     const [ci, setCi] = useState()
     const [卦1, set卦1] = useState()
-    const [pic, setPic] = useState("https://firebasestorage.googleapis.com/v0/b/suangua-47a55.appspot.com/o/卦象%2F乾卦一爻.jpeg?alt=media&token=615c9f96-2d94-48bb-9a9f-44eaec356746")
+    const [pic] = useState("https://firebasestorage.googleapis.com/v0/b/suangua-47a55.appspot.com/o/卦象%2F乾卦一爻.jpeg?alt=media&token=615c9f96-2d94-48bb-9a9f-44eaec356746")
     // const [卦2, set卦2] = useState()
     const [firstError, setFirstError] = useState()
     const [secondError, setSecondError] = useState()
