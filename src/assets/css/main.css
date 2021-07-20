@@ -1,6 +1,6 @@
 .navbar,
 .navbar-default {
-    background-image: linear-gradient(to right,#0F2027 ,#2C5364 100%) !important; /* override background image gradient w/ flat color */
+    background-image: linear-gradient(to right,#274046 ,#E6DADA 100%) !important; /* override background image gradient w/ flat color */
 }
 
 ul {
@@ -9,7 +9,7 @@ ul {
 li{
     padding-bottom: 10px;
     list-style-type: none;
-
+    padding-left: 10px;
 }
 .result{
     padding-top: 2vh;
@@ -27,4 +27,7 @@ li{
     fontSize: 12px;
     backgroundColor: #F5F7FA;
     cursor:pointer
+}
+#basic-nav-dropdown{
+    color:antiquewhite;
 }

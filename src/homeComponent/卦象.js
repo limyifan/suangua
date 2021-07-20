@@ -19,7 +19,6 @@ function Tu(props) {
             )
 
             }
-            {props.result!==""&& <h2>{卦名[props.result]["卦"]}卦</h2>}
         </div>
     );
 }

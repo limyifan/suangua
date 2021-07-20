@@ -10,7 +10,8 @@ import {networkSetup} from "./network";
 import Web3 from 'web3';
 import Account from "./accountComponent/account";
 import Error from "./errorComponent/error";
-import Contract from "../src/abis/CBC.json"
+import CBC from "../src/abis/CBC.json"
+import Gua from "../src/abis/Gua.json"
 import {SnackbarProvider} from "notistack";
 class App extends Component {
     constructor(props) {
@@ -19,8 +20,10 @@ class App extends Component {
             web3: 'undefined',
             account: '',
             token: null,
-            contract: null,
-            contractAddress: null
+            cbcContract: null,
+            cbcContractAddress: null ,
+            guaContract: null,
+            guaContractAddress: null
         }
     }
 
@@ -49,13 +52,22 @@ class App extends Component {
 
             //load contracts
             try {
-                const contract = new web3.eth.Contract(Contract.abi, Contract.networks[netId].address)
-                const contractAddress = Contract.networks[netId].address
-                this.setState({contract: contract, contractAddress: contractAddress})
+                const cbcContract = new web3.eth.Contract(CBC.abi, CBC.networks[netId].address)
+                const cbcContractAddress = CBC.networks[netId].address
+                this.setState({cbcContract: cbcContract, cbcContractAddress: cbcContractAddress})
 
             } catch (e) {
                 console.log('Error', e)
-                window.alert('Contracts not deployed to the current network')
+                window.alert('CBC Contracts not deployed to the current network')
+            }
+
+            try {
+                const guaContract = new web3.eth.Contract(Gua.abi, Gua.networks[netId].address)
+                const guaContractAddress = CBC.networks[netId].address
+                this.setState({guaContract:guaContract,guaContractAddress:guaContractAddress})
+            } catch (e) {
+                console.log('Error', e)
+                window.alert('Gua Contracts not deployed to the current network')
             }
 
         } else {
@@ -67,9 +79,9 @@ class App extends Component {
             <SnackbarProvider >
             <div className="App">
                 <BrowserRouter>
-                    <Header account={this.state.account} contract={this.state.contract}/>
+                    <Header account={this.state.account} cbcContract={this.state.cbcContract}/>
                     <Switch>
-                        <Route  exact path={routes.HOME} render={()=><Home account={this.state.account} contract={this.state.contract} />}/>
+                        <Route  exact path={routes.HOME} render={()=><Home account={this.state.account} cbcContract={this.state.cbcContract} guaContract={this.state.guaContract} />}/>
                         <Redirect path={"*"} component={Home}/>
                         <Route  exact path={routes.ACCOUNT} render={()=><Account account={this.state.account} balance={this.state.balance}/>}/>
                         <Route  exact path={routes.ERROR} component={Error}/>

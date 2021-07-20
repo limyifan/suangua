@@ -2,14 +2,15 @@ import React, {useEffect, useState} from 'react';
 import {Button, Form, FormControl, InputGroup} from "react-bootstrap";
 import firebase from "../firebase";
 import {爻, 卦名, 结果} from "../gua";
-import Result from "../resultComponent/result";
-import Loader from 'react-loader-spinner';
 import "../assets/css/main.css"
 import web3 from "web3";
-import { useSnackbar } from 'notistack';
+import {useSnackbar} from 'notistack';
+import {CircularProgressbarWithChildren} from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+import Result from "../resultComponent/result";
 
-function Home({account,contract}) {
-    const { enqueueSnackbar} = useSnackbar();
+function Home({account, cbcContract,guaContract}) {
+    const {enqueueSnackbar} = useSnackbar();
     const [firstNumber, setFirstNumber] = useState()
     const [secondNumber, setSecondNumber] = useState()
     const [thirdNumber, setThirdNumber] = useState()
@@ -18,11 +19,14 @@ function Home({account,contract}) {
     // const [result2, setResult2] = useState()
     const [ci, setCi] = useState()
     const [卦1, set卦1] = useState()
+    const [pic, setPic] = useState("https://firebasestorage.googleapis.com/v0/b/suangua-47a55.appspot.com/o/卦象%2F乾卦一爻.jpeg?alt=media&token=615c9f96-2d94-48bb-9a9f-44eaec356746")
     // const [卦2, set卦2] = useState()
     const [firstError, setFirstError] = useState()
     const [secondError, setSecondError] = useState()
     const [thirdError, setThirdError] = useState()
     const [isLoading, setIsLoading] = useState(false)
+    const [progress, setProgress] = useState(0)
+    const[docId,setDocId]=useState()
     const db = firebase.firestore();
 
     const changeHandler = e => {
@@ -69,6 +73,8 @@ function Home({account,contract}) {
     //                 }
     //                 switch(documentName)
     //                 {
+    //                     case("卦辞"):
+    //                         s[collectionName]={...s[collectionName],"卦辞":doc}
     //                     case("一爻"):
     //                         s[collectionName]={...s[collectionName],"一爻":doc}
     //                     case("二爻"):
@@ -81,8 +87,7 @@ function Home({account,contract}) {
     //                         s[collectionName]={...s[collectionName],"五爻":doc}
     //                     case("六爻"):
     //                         s[collectionName]={...s[collectionName],"六爻":doc}
-    //                     case("卦辞"):
-    //                         s[collectionName]={...s[collectionName],"卦辞":doc}
+    //
     //             }
     //                 // const db = firebase.firestore();
     //                 // db.collection(collectionName).doc(documentName).set(doc);
@@ -136,11 +141,23 @@ function Home({account,contract}) {
         return (firstError + secondError + thirdError).length === 0;
 
 
-
     }
     const isNumeric = (value) => {
         return /^\d+$/.test(value);
     }
+    useEffect(() => {
+        if (isLoading) {
+            setProgress(0)
+            const interval = setInterval(() => {
+                console.log(progress)
+                setProgress(progress => progress + 1);
+            }, 165);
+             setTimeout(() => {
+                clearInterval(interval)
+            }, 16500);
+        }
+    }, [isLoading]);
+
 
     const submitForm = async e => {
 
@@ -148,11 +165,11 @@ function Home({account,contract}) {
         const isValidate = validate();
         if (isValidate === false)
             return
-        setIsLoading(true)
-        let amount = web3.utils.toWei("1",'ether' )//convert to wei
-       await contract.methods.transfer("0xc16689b9a55ACdB244a77726f7248f2B7069E80c",amount).send({from: account})
+        let amount = web3.utils.toWei("0.01", 'ether')//convert to wei
+        await cbcContract.methods.transfer("0xc16689b9a55ACdB244a77726f7248f2B7069E80c", amount).send({from: account})
             .on('transactionHash', function (hash) {
                 console.log(hash)
+                setIsLoading(true)
             })
             .on('receipt', function (receipt) {
                 console.log(receipt)
@@ -167,25 +184,26 @@ function Home({account,contract}) {
                 set卦1(total);
                 // set卦2(result2);
                 setCi(辞)
-                setResult1(结果[卦][辞.toString()])
-                setResult12(结果[卦][爻[0].toString()])
+                setResult1(结果[卦][爻[0].toString()])
+                setResult12(结果[卦][辞.toString()])
 
                 addUserHistoru(total, 辞,)
-                    setIsLoading(false)
+                setIsLoading(false)
 
             })
             .on('error', function (e, receipt) {
-                switch (e.code)
-                {
+                switch (e.code) {
                     case(4001):
-                        enqueueSnackbar(`Transaction rejected by user`, {variant: 'error',
+                        enqueueSnackbar(`Transaction rejected by user`, {
+                            variant: 'error',
                             autoHideDuration: 3000,
                         })
                         setIsLoading(false)
                         break
 
                     default:
-                        enqueueSnackbar(`Transaction Failed`, {variant: 'error',
+                        enqueueSnackbar(`Transaction Failed`, {
+                            variant: 'error',
                             autoHideDuration: 3000,
                         })
                         console.log('Error, deposit: ', e)
@@ -196,36 +214,36 @@ function Home({account,contract}) {
 
 
     }
-    const addUserHistoru=(卦1,ci)=>{
+    const addUserHistoru = (卦1, ci) => {
 
-        if(account)
-        {
-            db.collection("users").where("walletAddress","==",account).get().then((snapshot)=>{
-                if(snapshot.size===0)
-                {
+        if (account) {
+            db.collection("users").where("walletAddress", "==", account).get().then((snapshot) => {
+                if (snapshot.size === 0) {
                     //create new document
                     db.collection("users").add({
-                        walletAddress:account
-                    }).then((doc)=>{
-                        doc.collection("history").add(
-                            {
-                                time:Date.now(),
-                                gua:卦1.toString(),
-                                ci:ci,
-                            }
-                        )
+                        walletAddress: account
+                    }).then((doc) => {
+                            doc.collection("history").add(
+                                {
+                                    time: Date.now(),
+                                    gua: 卦1.toString(),
+                                    ci: ci,
+                                }
+                            ).then((docRef)=>{
+                                setDocId(docRef.id)
+                            })
                         }
                     )
-                }
-                else
-                {
+                } else {
                     snapshot.docs[0].ref.collection("history").add(
                         {
-                            time:Date.now(),
-                            gua:卦1.toString(),
-                            ci:ci,
+                            time: Date.now(),
+                            gua: 卦1.toString(),
+                            ci: ci,
                         }
-                    )
+                    ).then((docRef)=>{
+                        setDocId(docRef.id)
+                    })
                 }
             })
         }
@@ -275,6 +293,8 @@ function Home({account,contract}) {
         set卦1(undefined)
         // set卦2(undefined)
     }
+
+
     return (
         <div>
             <div className="container-md col-lg-4 col-md-4 col-sm-4 container justify-content-center">
@@ -330,20 +350,29 @@ function Home({account,contract}) {
                     使用《易经》占卦，需要遵守“三不占”原则：1.不诚不占：此乃求教于神明，首重真诚。2.不义不占：不合乎正当性及道义的问题，不必占问。3.不疑不占：必须是理性难以测度之事，因为有些问题依照常理常情可决定其结果，也不必占问。
                 </Form.Text>
             </div>
-            {result1 && result12 && !isLoading && <div><a href="/" onClick={reset}><p>重新计算</p></a>
-                <Result 卦1={卦1} result1={result1} result12={result12} 辞={ci}/>
+            {result1 && result12 && !isLoading && <div>
+                <Button variant="outline-danger" onClick={reset} style={{marginTop: "10px", marginBottom: "10px"}}>
+                    重新计算
+                </Button>
+                <Result 卦1={卦1} result1={result1} result12={result12} 辞={ci} pic={pic} guaContract={guaContract} account={account} docId={docId}/>
             </div>}
             {isLoading && <div
                 style={{
-                    width: "100%",
-                    height: "100",
-                    display: "flex",
+                    width: "15vh",
+                    margin: "auto",
                     justifyContent: "center",
-                    alignItems: "center",
-                    paddingTop:"5vh"
+                    paddingTop: "5vh"
                 }}
             >
-                <Loader type="BallTriangle" color="#005bbd" height="15vh" width="15vh"/>
+                <CircularProgressbarWithChildren value={progress}>
+                    <div style={{fontSize: 13, marginTop: -5}}>
+                        <strong>{progress > 99 ? 99 : progress}%</strong>
+                    </div>
+                    <div style={{fontSize: 14, marginTop: -5}}>
+                        <strong>处理中</strong>
+                    </div>
+                </CircularProgressbarWithChildren>
+                {/*<Loader type="BallTriangle" color="#005bbd" height="15vh" width="15vh"/>*/}
             </div>}
         </div>
     );

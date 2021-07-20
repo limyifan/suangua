@@ -1,32 +1,57 @@
 import React from 'react';
-import 八卦 from"../assets/icons/bagua.png"
+import 八卦 from "../assets/icons/logo.png"
 import {Link, NavLink} from "react-router-dom";
 import * as routes from "../routes";
 import {Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {useSnackbar} from "notistack";
 import web3 from "web3";
+import {卦名, 爻, 结果} from "../gua";
 
-function Header({contract,account}) {
-    const {enqueueSnackbar} = useSnackbar();
+function Header({cbcContract, account}) {
+    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
     const TOKEN_ADDRESS = '0x7139b4A901b9147d5715Cc7b715337Cf295e5235';
 
-    const hideAccountDetail=(id)=>{
-        return id.substring(0,5)+"......"+id.substring(id.length-3)
+    const hideAccountDetail = (id) => {
+        return id.substring(0, 5) + "......" + id.substring(id.length - 3)
     }
-    const mintToken= async () => {
+    const mintToken = async () => {
         if (window.ethereum) {
-            try{
-                await contract.methods.mint(web3.utils.toWei("10","ether")).send({from:account}) //mint token initially
-            }
-            catch (e) {
-                enqueueSnackbar("Failed to mint token", {
-                    variant: 'error',
-                    anchorOrigin: {
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    },
+
+            await cbcContract.methods.mint(web3.utils.toWei("1000", "ether")).send({from: account})
+                .on('transactionHash', function (hash) {
+                    console.log(hash)
+                    enqueueSnackbar(`Transaction Pending...`, {
+                        variant: 'info', persist: true,
+                    })
+                })
+                .on('receipt', function (receipt) {
+                    console.log(receipt)
+                    if (receipt) {
+                        closeSnackbar()
+                        enqueueSnackbar("Token mint successfully", {
+                            variant: 'success',
+                            autoHideDuration: 3000,
+                        });
+                    }
+                })//mint token initially
+                .on('error', function (e, receipt) {
+                    switch (e.code) {
+                        case(4001):
+                            enqueueSnackbar(`Transaction rejected by user`, {
+                                variant: 'error',
+                                autoHideDuration: 3000,
+                            })
+                            break
+
+                        default:
+                            closeSnackbar()
+                            enqueueSnackbar("Failed to mint token", {
+                                variant: 'error',
+                            })
+                            break
+                    }
                 });
-            }
+
         } else {
         }
     }
@@ -76,6 +101,7 @@ function Header({contract,account}) {
         } else {
         }
     }
+
     return (
         <Navbar className="navbar navbar-dark bg-dark">
             <div className="container">
@@ -83,11 +109,12 @@ function Header({contract,account}) {
                     <img src={八卦} alt="" width="40" height="40"/>
                     <span>&nbsp;&nbsp;算卦选币</span>
                 </Link>
-                {account&&contract&&  <Nav>
-                    <NavDropdown title={account&&hideAccountDetail(account)} id="basic-nav-dropdown">
-                        <NavDropdown.Item><NavLink to={routes.ACCOUNT}>View Account Details</NavLink></NavDropdown.Item>
+                {account && cbcContract && <Nav>
+                    <NavDropdown title={account && hideAccountDetail(account)} id="basic-nav-dropdown">
+                        <NavDropdown.Item><NavLink to={routes.ACCOUNT}>View Account
+                            Details</NavLink></NavDropdown.Item>
                         <NavDropdown.Item onClick={mintToken}>Mint CBC Token</NavDropdown.Item>
-                        <NavDropdown.Divider />
+                        <NavDropdown.Divider/>
                         <NavDropdown.Item onClick={addTokenToWallet}>Add CBC Token to Wallet</NavDropdown.Item>
                     </NavDropdown>
                 </Nav>}
@@ -95,7 +122,7 @@ function Header({contract,account}) {
             </div>
         </Navbar>
 
-);
+    );
 }
 
 export default Header;
